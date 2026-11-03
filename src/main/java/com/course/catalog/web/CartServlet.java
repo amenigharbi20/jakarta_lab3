@@ -3,6 +3,7 @@ package com.course.catalog.web;
 import com.course.catalog.model.ProductDTO;
 import com.course.catalog.service.CartService;
 import com.course.catalog.service.ProductService;
+import com.course.catalog.service.PromotionService;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,10 +21,15 @@ public class CartServlet extends HttpServlet {
     @Inject
     private ProductService productService;
 
+    @Inject
+    private PromotionService promotionService;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setAttribute("cart", cartService.getItems());
+        req.setAttribute("subtotal", String.format("%.2f", promotionService.getSubtotal()));
+        req.setAttribute("discountedTotal", String.format("%.2f", promotionService.getTotalAfterDiscount()));
         req.getRequestDispatcher("/WEB-INF/views/cart.jsp").forward(req, resp);
     }
 

@@ -22,6 +22,7 @@
         </li>
       </c:forEach>
     </ul>
+<c:if test="${not empty cart}"><p>Subtotal: ${subtotal} EUR | After 10% discount: <b>${discountedTotal} EUR</b></p></c:if>
     <p><a href="${pageContext.request.contextPath}/checkout">Proceed to checkout</a></p>
   </c:otherwise>
 </c:choose>
