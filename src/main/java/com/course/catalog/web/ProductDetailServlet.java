@@ -1,5 +1,6 @@
 package com.course.catalog.web;
 
+import com.course.catalog.model.ProductDTO;
 import com.course.catalog.service.ProductService;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -18,8 +19,27 @@ public class ProductDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Long id = Long.valueOf(req.getParameter("id"));
-        req.setAttribute("product", productService.getProduct(id));
+
+        String idParam = req.getParameter("id");
+        if (idParam == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing id");
+            return;
+        }
+
+        ProductDTO product;
+        try {
+            product = productService.getProduct(Long.valueOf(idParam));
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid id");
+            return;
+        }
+
+        if (product == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Product not found");
+            return;
+        }
+
+        req.setAttribute("product", product);
         req.getRequestDispatcher("/WEB-INF/views/product-detail.jsp").forward(req, resp);
     }
 }

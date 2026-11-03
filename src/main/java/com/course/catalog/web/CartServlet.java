@@ -1,5 +1,6 @@
 package com.course.catalog.web;
 
+import com.course.catalog.model.ProductDTO;
 import com.course.catalog.service.CartService;
 import com.course.catalog.service.ProductService;
 import jakarta.inject.Inject;
@@ -29,8 +30,46 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Long productId = Long.valueOf(req.getParameter("productId"));
-        cartService.addItem(productService.getProduct(productId));
+        if ("/cart/remove".equals(req.getServletPath())) {
+            removeFromCart(req, resp);
+        } else {
+            addToCart(req, resp);
+        }
+    }
+
+    private void addToCart(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idParam = req.getParameter("productId");
+        if (idParam == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing productId");
+            return;
+        }
+
+        ProductDTO product;
+        try {
+            product = productService.getProduct(Long.valueOf(idParam));
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid productId");
+            return;
+        }
+
+        if (product == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Product not found");
+            return;
+        }
+
+        cartService.addItem(product);
+        resp.sendRedirect(req.getContextPath() + "/cart");
+    }
+
+    private void removeFromCart(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String indexParam = req.getParameter("index");
+        if (indexParam != null) {
+            try {
+                cartService.removeAt(Integer.parseInt(indexParam));
+            } catch (NumberFormatException ignored) {
+                // index invalide : rien n'est supprime
+            }
+        }
         resp.sendRedirect(req.getContextPath() + "/cart");
     }
 }

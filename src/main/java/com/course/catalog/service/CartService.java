@@ -23,6 +23,13 @@ public class CartService implements Serializable {
         items.removeIf(p -> p.getId().equals(productId));
     }
 
+    // Suppression par position, comme au Lab 2 (le champ "index" de cart.jsp)
+    public void removeAt(int index) {
+        if (index >= 0 && index < items.size()) {
+            items.remove(index);
+        }
+    }
+
     public List<ProductDTO> getItems() {
         return items;
     }
