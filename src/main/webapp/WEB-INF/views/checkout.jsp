@@ -3,6 +3,7 @@
 <jsp:include page="header.jsp" />
 
 <h2>Checkout</h2>
+<p style="color:red">${errorMessage}</p>
 
 <c:choose>
     <c:when test="${not empty confirmationName}">

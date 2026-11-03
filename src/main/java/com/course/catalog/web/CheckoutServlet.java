@@ -1,5 +1,6 @@
 package com.course.catalog.web;
 
+import com.course.catalog.service.EmptyCartException;
 import com.course.catalog.service.OrderService;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -28,9 +29,12 @@ public class CheckoutServlet extends HttpServlet {
         String email   = req.getParameter("email");
         String address = req.getParameter("address");
 
-        orderService.createOrder(name, email, address);
-
-        req.setAttribute("confirmationName", name);
+        try {
+            orderService.createOrder(name, email, address);
+            req.setAttribute("confirmationName", name);
+        } catch (EmptyCartException e) {
+            req.setAttribute("errorMessage", e.getMessage());
+        }
         req.getRequestDispatcher("/WEB-INF/views/checkout.jsp").forward(req, resp);
     }
 }
